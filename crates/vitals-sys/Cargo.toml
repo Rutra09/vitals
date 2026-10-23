@@ -1,0 +1,12 @@
+[package]
+name = "vitals-sys"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+vitals-core.workspace = true
+anyhow.workspace = true
+log.workspace = true
+serde_json.workspace = true
+windows.workspace = true

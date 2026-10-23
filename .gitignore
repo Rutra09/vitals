@@ -1,0 +1,11 @@
+/target/
+/previews/
+trace-*.txt
+
+*.log
+*.pdb
+*.exe
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
