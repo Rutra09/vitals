@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release --locked -p vitals-app
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $zip = "vitals-$tag-windows-x64.zip"
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          Copy-Item target/release/vitals.exe dist/
+          Copy-Item README.md, LICENSE, NOTICE.md dist/
+          Compress-Archive -Path dist/* -DestinationPath $zip
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower()
+          "$hash  $zip" | Set-Content SHA256SUMS.txt -Encoding ascii
+
+      - name: Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          @'
+          Initial public release of Vitals for Windows 11 x64.
+
+          Extract the zip and run `vitals.exe --install` to install per-user. The build is unsigned, so Windows SmartScreen may warn.
+
+          There is no auto-update; download future releases manually.
+          '@ | Set-Content RELEASE_NOTES.md -Encoding utf8
+          gh release create "${{ github.ref_name }}" `
+            "vitals-${{ github.ref_name }}-windows-x64.zip" `
+            "SHA256SUMS.txt" `
+            --title "Vitals ${{ github.ref_name }}" `
+            --notes-file RELEASE_NOTES.md `
+            --verify-tag

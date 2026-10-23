@@ -65,7 +65,13 @@ behavior are all configurable. Settings changes take effect immediately.
 
 ## Install
 
-Vitals targets Windows 11 on x64 with the MSVC toolchain.
+Download the latest prebuilt Windows x64 zip from the [latest release](../../releases/latest), extract it, and run:
+
+```powershell
+.\vitals.exe --install
+```
+
+The release build is unsigned, so Windows SmartScreen may warn. To build from source instead, use the MSVC toolchain:
 
 ```powershell
 cargo build --release -p vitals-app
